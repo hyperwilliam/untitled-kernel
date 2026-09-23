@@ -61,6 +61,30 @@ int printf(const char* restrict format, ...) {
 			if (!print(str, len))
 				return -1;
 			written += len;
+		} else if (*format == 'x') {
+			format++;
+			unsigned int uint = va_arg(parameters, unsigned int);
+			if (!maxrem) {
+				// TODO: Set errno to EOVERFLOW.
+				return -1;
+			}
+			const char index[16] = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+			for (unsigned char i = 0; i < 8; i++)
+				if (!print(&index[(uint >> (i * 4)) & 0xF ], 1))
+					return -1;
+			written++;
+		} else if (*format == 'X') {
+			format++;
+			unsigned int uint = va_arg(parameters, unsigned int);
+			if (!maxrem) {
+				// TODO: Set errno to EOVERFLOW.
+				return -1;
+			}
+			const char index[16] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+			for (unsigned char i = 0; i < 8; i++)
+				if (!print(&index[(uint >> (i * 4)) & 0xF ], 1))
+					return -1;
+			written++;
 		} else {
 			format = format_begun_at;
 			size_t len = strlen(format);

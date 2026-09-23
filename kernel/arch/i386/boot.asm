@@ -23,10 +23,11 @@ section .text
 global _start:function (_start.end - _start)
 _start:
 	mov esp, stack_top
+	push eax
+	push ebx
     call setGdt ; woah, it doesnt crash! :D
 	extern _init
 	call _init
-	push ebx
 	extern kernel_early
 	call kernel_early ; i spent a whole hour trying to figure out why my kernel was not working, then i saw that i was calling kernel_main... oops :)
 	cli
