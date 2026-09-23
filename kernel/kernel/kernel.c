@@ -30,12 +30,9 @@ void kernel_early(multiboot_info_t* mbd, uint32_t magic) {
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC) {
       panic_early("Multiboot magic is not valid!");
     }
-
     if(!(mbd->flags >> 6 & 0x1)) {
       panic_early("Invalid Memory Map From Multiboot!");
     }
-
-
     printf("---- MEMORY MAP ----\n\n");
     int i;
     for(i = 0; i < mbd->mmap_length;
@@ -48,19 +45,19 @@ void kernel_early(multiboot_info_t* mbd, uint32_t magic) {
           //       mmmt->addr_low, mmmt->len_low, mmmt->size, mmmt->type);
           if (mmmt->addr_high == 0) {
             if(mmmt->type == MULTIBOOT_MEMORY_AVAILABLE) {
-              printf("RAM Available at 0x%X to 0x%X!\n", mmmt->addr_low, mmmt->len_low + mmmt->addr_low);
+              printf("RAM Available at 0x%X to 0x%X!\n", mmmt->addr_low, mmmt->len_low + mmmt->addr_low - 1);
             }
             if(mmmt->type == MULTIBOOT_MEMORY_RESERVED) {
-              printf("Reserved Memory at 0x%X to 0x%X!\n", mmmt->addr_low, mmmt->len_low + mmmt->addr_low);
+              printf("Reserved Memory at 0x%X to 0x%X!\n", mmmt->addr_low, mmmt->len_low + mmmt->addr_low - 1);
             }
             if(mmmt->type == MULTIBOOT_MEMORY_ACPI_RECLAIMABLE) {
-              printf("APCI Reclaimable at 0x%X to 0x%X!\n", mmmt->addr_low, mmmt->len_low + mmmt->addr_low);
+              printf("APCI Reclaimable at 0x%X to 0x%X!\n", mmmt->addr_low, mmmt->len_low + mmmt->addr_low - 1);
             }
             if(mmmt->type == MULTIBOOT_MEMORY_NVS) {
-              printf("NVS at 0x%X to 0x%X..?\n", mmmt->addr_low);
+              printf("NVS at 0x%X to 0x%X..?\n", mmmt->addr_low, mmmt->len_low + mmmt->addr_low - 1);
             }
             if(mmmt->type == MULTIBOOT_MEMORY_BADRAM) {
-              printf("Faulty RAM at 0x%X to 0x%X!, Get that checked!\n", mmmt->addr_low, mmmt->len_low + mmmt->addr_low);
+              printf("Faulty RAM at 0x%X to 0x%X!, Get that checked!\n", mmmt->addr_low, mmmt->len_low + mmmt->addr_low - 1);
             }
           }
         }
