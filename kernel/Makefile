@@ -48,7 +48,7 @@ $(ARCHDIR)/crtend.o \
 $(ARCHDIR)/crtn.o \
 
 .PHONY: all clean install install-headers install-kernel
-.SUFFIXES: .o .c .asm .S
+.SUFFIXES: .o .c .S .asm
 
 all: untitledos.kernel
 
@@ -64,8 +64,8 @@ $(ARCHDIR)/crtbegin.o $(ARCHDIR)/crtend.o:
 
 .asm.o:
 	nasm -felf32 $< -o $@
-#.S.o:
-#	$(CC) -MD -c $< -o $@ $(CFLAGS) $(CPPFLAGS)
+.S.o:
+	$(CC) -MD -c $< -o $@ $(CFLAGS) $(CPPFLAGS)
 
 clean:
 	rm -f UntitledOS.kernel

@@ -6,7 +6,8 @@
 #include <kernel/tty.h>
 
 #include "vga.h"
-#include "io.c" // here until i find a way to do otherwise :)
+// the include is here because i dont know where else to put it :)
+#include "io.h"
 static const size_t VGA_WIDTH = 80;
 static const size_t VGA_HEIGHT = 25;
 static uint16_t* const VGA_MEMORY = (uint16_t*) 0xB8000;
