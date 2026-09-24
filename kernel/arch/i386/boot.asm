@@ -2,15 +2,29 @@
 ; TODO: make this use multiboot2, but only if multiboot1 is not useful enough.
 MBALIGN  equ  1 << 0
 MEMINFO  equ  1 << 1
-MBFLAGS  equ  MBALIGN | MEMINFO
+VIDEOINFO equ 1 << 2
+MBFLAGS  equ  MBALIGN | MEMINFO | VIDEOINFO
 MAGIC    equ  0x1BADB002
 CHECKSUM equ -(MAGIC + MBFLAGS)
 
+VMODETYPE equ 0
+VMODEWIDTH equ 800
+VMODEHEIGHT equ 600
+VMODEDEPTH equ 8
 section .multiboot
 align 4
 	dd MAGIC
 	dd MBFLAGS
 	dd CHECKSUM
+	dd 0
+	dd 0
+	dd 0
+	dd 0
+	dd 0
+	dd VMODETYPE
+	dd VMODEWIDTH
+	dd VMODEHEIGHT
+	dd VMODEDEPTH
 
 section .bss
 align 16
