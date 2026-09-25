@@ -12,6 +12,7 @@ const char* kernel_version_mid = "0"; // i should increment this one if i add ne
 const char* kernel_version_low = "0";// i should increment this one for bugfixes.
 const char* kernel_version_prefix = "-Prototype"; // do i really have to explain this one tho :)
 unsigned int kernel_reserve = 0x1000000; // reserve 16 MB for kernel :)
+unsigned int alloc_map_reserve = 0x1000000; // reserve 16 MB for the memory allocation map :)
 unsigned int targetRamBase = 0; // base of the largest RAM region.
 unsigned int targetRamSize = 0; // size of the largest RAM region.
 struct mem_reserve_block {
@@ -130,7 +131,7 @@ void kernel_early(multiboot_info_t* mbd, uint32_t magic) {
     if (mbd->framebuffer_type == 2) {
       printf("Now Outputting To Display!\n");
     } else {
-      printf("Font File Read! Now Outputting to display!\n");
+      printf("Display Is Running At 800x600\n"); // TODO: make this value not hardcoded
     }
 	printf("UntitledKernel %s.%s.%s%s!\n", kernel_version_high, kernel_version_mid, kernel_version_low, kernel_version_prefix);
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC) {
@@ -177,6 +178,7 @@ void kernel_early(multiboot_info_t* mbd, uint32_t magic) {
       targetRamSize -= kernel_reserve;
       printf("Corrected RAM Offset To Avoid Overwriting Kernel!\n");
     }
+    // TODO: make the bitmap field resize based on the RAM in the computer.
 	//abort();
     kpanic("Nothing Left To Do...\n");
 }
