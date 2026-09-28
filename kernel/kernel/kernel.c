@@ -5,6 +5,9 @@
 #include <string.h>
 #include "multiboot.h"
 #include <kernel/tty.h>
+#include <kernel/panic.h>
+#include <kernel/ints.h>
+#include <kernel/vga.h>
 
 // TODO: make panic_early() and panic() display registers and other thingys :)
 const char* kernel_version_high = "1"; // i should increment this one if the update might break some programs :)
@@ -44,11 +47,6 @@ typedef struct {
 } PSF_font;
 
 struct tar_header *RamdiskHeaders[32];
-
-void kpanic(const char* reason) {
-  printf("Kernel Panic: %s\n", reason);
-  for(;;);
-}
 
 unsigned int gettarsize(const char *in)
 {
@@ -128,12 +126,16 @@ void kernel_early(multiboot_info_t* mbd, uint32_t magic) {
     uint32_t* fontData =  (uint32_t*)fontheader + 8;
     printf("FontData = 0x%X\n", fontData);
     terminal_highres(mbd->framebuffer_width, mbd->framebuffer_height, fontheader->width, fontheader->height, mbd->framebuffer_addr, (unsigned int)fontData, mbd->framebuffer_type, mbd->framebuffer_pitch); // input 0 = width, input 1 = height, input 2 = font width, input 3 = font height, input 4 = pointer to video mem, input 5 = pointer to PSF file (stored and found in init.rd) input 6 = video mode type, input 7 = bytes per line
+    interrupts_initialise();
+    terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_GREEN));
     if (mbd->framebuffer_type == 2) {
       printf("Now Outputting To Display!\n");
     } else {
-      printf("Display Is Running At 800x600\n"); // TODO: make this value not hardcoded
+      printf("Display Is Running At %ux%u\n", mbd->framebuffer_width, mbd->framebuffer_height);
     }
+    terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLUE));
 	printf("UntitledKernel %s.%s.%s%s!\n", kernel_version_high, kernel_version_mid, kernel_version_low, kernel_version_prefix);
+    terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC) {
       kpanic("Multiboot magic is not valid!");
     }
