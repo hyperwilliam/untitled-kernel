@@ -10,7 +10,7 @@
 #include <kernel/vga.h>
 
 // TODO: make panic_early() and panic() display registers and other thingys :)
-const char* kernel_version_high = "1"; // i should increment this one if the update might break some programs :)
+const char* kernel_version_high = "0"; // i should increment this one if the update might break some programs :)
 const char* kernel_version_mid = "0"; // i should increment this one if i add new features, but they wont break anything :)
 const char* kernel_version_low = "0";// i should increment this one for bugfixes.
 const char* kernel_version_prefix = "-A"; // do i really have to explain this one tho :)
