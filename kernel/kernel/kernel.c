@@ -13,9 +13,8 @@
 const char* kernel_version_high = "1"; // i should increment this one if the update might break some programs :)
 const char* kernel_version_mid = "0"; // i should increment this one if i add new features, but they wont break anything :)
 const char* kernel_version_low = "0";// i should increment this one for bugfixes.
-const char* kernel_version_prefix = "-Prototype"; // do i really have to explain this one tho :)
+const char* kernel_version_prefix = "-A"; // do i really have to explain this one tho :)
 unsigned int kernel_reserve = 0x1000000; // reserve 16 MB for kernel :)
-unsigned int alloc_map_reserve = 0x1000000; // reserve 16 MB for the memory allocation map :)
 unsigned int targetRamBase = 0; // base of the largest RAM region.
 unsigned int targetRamSize = 0; // size of the largest RAM region.
 struct mem_reserve_block {
@@ -89,8 +88,8 @@ unsigned int parse(unsigned int address) {
 }
 
 void kernel_early(multiboot_info_t* mbd, uint32_t magic) {
-    // alright, now to read the MODULES (until i find the psf file.)
-    // to read kernel panics or messages here, you will need to comment out the VIDEOINFO field in the MBFLAGS at boot.asm!
+    // alright, now to read the init ramdisk (until i find the psf file.)
+    // to read kernel panics or messages here, you will need to comment out the VIDEOINFO field in the MBFLAGS in boot.asm!
 	terminal_initialize();
     if (mbd->mods_count == 0) {
       kpanic("You need to load a init.rd in the modules.");
