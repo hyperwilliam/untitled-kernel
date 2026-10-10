@@ -101,6 +101,12 @@ interrupt_wrapper:
     popad
     iret
 .end:
+global compiledate
+global compiletime
+compiletime:
+db __?TIME?__, 0x00
+compiledate:
+db __?DATE?__, 0x00
 
 
 global isr0

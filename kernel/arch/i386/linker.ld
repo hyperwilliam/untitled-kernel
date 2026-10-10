@@ -37,7 +37,9 @@ SECTIONS
 		*(COMMON)
 		*(.bss)
 	}
-
+    .align BLOCK(16K) : ALIGN(16K) {
+      topOfKernel = .;
+    }
 	/* The compiler may produce other sections, put them in the proper place in
 	   in this file, if you'd like to include them in the final kernel. */
 }

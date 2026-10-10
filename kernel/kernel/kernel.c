@@ -11,10 +11,12 @@
 
 // TODO: make panic_early() and panic() display registers and other thingys :)
 const char* kernel_version_high = "0"; // i should increment this one if the update might break some programs :)
-const char* kernel_version_mid = "0"; // i should increment this one if i add new features, but they wont break anything :)
+const char* kernel_version_mid = "1"; // i should increment this one if i add new features, but they wont break anything :)
 const char* kernel_version_low = "0";// i should increment this one for bugfixes.
 const char* kernel_version_prefix = "-A"; // do i really have to explain this one tho :)
-unsigned int kernel_reserve = 0x1000000; // reserve 16 MB for kernel :)
+extern unsigned int topOfKernel; // decided by linker
+extern const char* compiletime; // decided by assembler
+extern const char* compiledate; // decided by assembler
 unsigned int targetRamBase = 0; // base of the largest RAM region.
 unsigned int targetRamSize = 0; // size of the largest RAM region.
 struct mem_reserve_block {
@@ -135,6 +137,7 @@ void kernel_early(multiboot_info_t* mbd, uint32_t magic) {
     terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLUE));
 	printf("UntitledKernel %s.%s.%s%s!\n", kernel_version_high, kernel_version_mid, kernel_version_low, kernel_version_prefix);
     terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
+    printf("Built on %s at %s!\n", &compiledate, &compiletime);
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC) {
       kpanic("Multiboot magic is not valid!");
     }
@@ -175,9 +178,9 @@ void kernel_early(multiboot_info_t* mbd, uint32_t magic) {
         }
     printf("\n--------------------\n\n");
     if (targetRamBase == 0x100000) { // this is where our kernel is loaded, so we will increase the base value and decrement the size to avoid overwriting it.
-      targetRamBase += kernel_reserve;
-      targetRamSize -= kernel_reserve;
-      printf("Corrected RAM Offset To Avoid Overwriting Kernel!\n");
+      targetRamBase += ((unsigned int)&topOfKernel) - 0x100000;
+      targetRamSize -= ((unsigned int)&topOfKernel) - 0x100000;
+      printf("Reserved 0x%X Bytes Of Memory For Kernel!\n", ((unsigned int)&topOfKernel) - 0x100000);
     }
     // TODO: make the bitmap field resize based on the RAM in the computer.
 	//abort();
