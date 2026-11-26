@@ -2,6 +2,7 @@
 #include <kernel/panic.h>
 #include <stdint.h>
 #include <stdio.h>
+#include "printf_early.h"
 #include "ints.h"
 typedef struct {
     uint16_t offset_low;
@@ -33,7 +34,7 @@ const char* errstrs[32] = {
     "Divide By Zero Exception",
     "Debug Interrupt",
     "Non Maskable Interrupt",
-    "Breakpoint",
+    "Breakpoint\n",
     "Overflow",
     "Bound Range Exceeded",
     "Invalid Opcode",
@@ -64,8 +65,13 @@ const char* errstrs[32] = {
     "Reserved"
 };
 
-void code_exception_handler(uint32_t interrupt, uint32_t errorcode) {
+void code_exception_handler(uint32_t callAddr, uint32_t interrupt, uint32_t errorcode) {
+    printf_early("Exception Error Code: %u\n", errorcode);
     kpanic(errstrs[interrupt]);
+}
+
+void breakpoint_handler(uint32_t callAddr, uint32_t interrupt, uint32_t errorcode) {
+    printf_early(errstrs[interrupt]);
 }
 
 void isr_handler() {

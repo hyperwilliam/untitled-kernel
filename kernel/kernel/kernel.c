@@ -1,19 +1,35 @@
-#include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-#include "multiboot.h"
-#include <kernel/tty.h>
-#include <kernel/panic.h>
-#include <kernel/ints.h>
-#include <kernel/vga.h>
+
+
+
+
+
+
+// until further progress is made in init.c, this part of the OS will be removed.
+// anyways, this file would be for after the platform is properly initialised, and would essentially be platform independent.
+
+
+
+
+
+
+
+
+
+/*
+ #include <stdio.h>
+ #include <stdint.h>
+ #include <stdlib.h>
+ #include <stdbool.h>
+ #include <string.h>
+ #include "multiboot.h"
+ #include <kernel/tty.h>
+ #include <kernel/panic.h>
+ #include <kernel/ints.h>
+ #include <kernel/vga.h>
 
 // TODO: make panic_early() and panic() display registers and other thingys :)
-const char* kernel_version_high = "0"; // i should increment this one if the update might break some programs :)
-const char* kernel_version_mid = "1"; // i should increment this one if i add new features, but they wont break anything :)
+const char* kernel_version_high = "1"; // i should increment this one if the update is a fairly large change :)
 const char* kernel_version_low = "0";// i should increment this one for bugfixes.
-const char* kernel_version_prefix = "-A"; // do i really have to explain this one tho :)
 extern unsigned int topOfKernel; // decided by linker
 extern const char* compiletime; // decided by assembler
 extern const char* compiledate; // decided by assembler
@@ -37,14 +53,14 @@ struct tar_header { // you know, i could probably make a better version of this 
 #define PSF_FONT_MAGIC 0x864ab572
 
 typedef struct {
-  uint32_t magic;         /* magic bytes to identify PSF */
-  uint32_t version;       /* zero */
-  uint32_t headersize;    /* offset of bitmaps in file, 32 */
-  uint32_t flags;         /* 0 if there's no unicode table */
-  uint32_t numglyph;      /* number of glyphs */
-  uint32_t bytesperglyph; /* size of each glyph */
-  uint32_t height;        /* height in pixels */
-  uint32_t width;         /* width in pixels */
+  uint32_t magic;         // magic bytes to identify PSF
+  uint32_t version;       // zero
+  uint32_t headersize;    // offset of bitmaps in file, 32
+  uint32_t flags;         // 0 if there's no unicode table
+  uint32_t numglyph;      // number of glyphs
+  uint32_t bytesperglyph; // size of each glyph
+  uint32_t height;        // height in pixels
+  uint32_t width;         // width in pixels
 } PSF_font;
 
 struct tar_header *RamdiskHeaders[32];
@@ -135,7 +151,12 @@ void kernel_early(multiboot_info_t* mbd, uint32_t magic) {
       printf("Display Is Running At %ux%u\n", mbd->framebuffer_width, mbd->framebuffer_height);
     }
     terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLUE));
-	printf("UntitledKernel %s.%s.%s%s!\n", kernel_version_high, kernel_version_mid, kernel_version_low, kernel_version_prefix);
+	printf("UntitledKernel-r%s", kernel_version_high);
+    if (kernel_version_low[0] != '0') {
+      printf(".%s!\n", kernel_version_low);
+    } else {
+      printf("!\n");
+    }
     terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
     printf("Built on %s at %s!\n", &compiledate, &compiletime);
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC) {
@@ -182,11 +203,11 @@ void kernel_early(multiboot_info_t* mbd, uint32_t magic) {
       targetRamSize -= ((unsigned int)&topOfKernel) - 0x100000;
       printf("Reserved 0x%X Bytes Of Memory For Kernel!\n", ((unsigned int)&topOfKernel) - 0x100000);
     }
-    // TODO: make the bitmap field resize based on the RAM in the computer.
-	//abort();
     kpanic("Nothing Left To Do...\n");
 }
 
 void kernel_main() {
   kpanic("what now :(");
 }
+
+*/

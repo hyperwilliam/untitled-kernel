@@ -3,28 +3,16 @@
 MBALIGN  equ  1 << 0
 MEMINFO  equ  1 << 1
 VIDEOINFO equ 1 << 2
-MBFLAGS  equ  MBALIGN | MEMINFO | VIDEOINFO
+MBFLAGS  equ  MBALIGN | MEMINFO
 MAGIC    equ  0x1BADB002
 CHECKSUM equ -(MAGIC + MBFLAGS)
 
-VMODETYPE equ 0
-VMODEWIDTH equ 800
-VMODEHEIGHT equ 600
-VMODEDEPTH equ 8
+; Video information should now be stored in 'config.uhf'
 section .multiboot
 align 4
 	dd MAGIC
 	dd MBFLAGS
 	dd CHECKSUM
-	dd 0
-	dd 0
-	dd 0
-	dd 0
-	dd 0
-	dd VMODETYPE
-	dd VMODEWIDTH
-	dd VMODEHEIGHT
-	dd VMODEDEPTH
 
 section .bss
 align 16
@@ -42,8 +30,8 @@ _start:
     call setGdt ; woah, it doesnt crash! :D
 	extern _init
 	call _init
-	extern kernel_early
-	call kernel_early ; i spent a whole hour trying to figure out why my kernel was not working, then i saw that i was calling kernel_main... oops :)
+	extern kernel_init
+	call kernel_init
 	cli
 .hang:	hlt
 	jmp .hang
@@ -92,6 +80,7 @@ db 0 ; base bits 24-31
 
 global _interrupt_wrapper:function (_interrupt_wrapper.end - _interrupt_wrapper)
 extern code_exception_handler
+extern breakpoint_handler
 interrupt_wrapper:
     pushad
     cld    ; C code following the sysV ABI requires DF to be clear on function entry
@@ -99,7 +88,15 @@ interrupt_wrapper:
     call code_exception_handler
     sub esp, 32
     popad
-    iret
+    ret
+interrupt_break_wrapper:
+    pushad
+    cld    ; C code following the sysV ABI requires DF to be clear on function entry
+    add esp, 32
+    call breakpoint_handler
+    sub esp, 32
+    popad
+    ret
 .end:
 global compiledate
 global compiletime
@@ -146,19 +143,27 @@ global isr31
 isr%1:
     push dword 0
     push dword %1
-    jmp interrupt_wrapper
+    call interrupt_wrapper
+    iret
 %endmacro
 
 %macro ISR_ERRCODE 1
 isr%1:
     push dword %1
-    jmp interrupt_wrapper
+    call interrupt_wrapper
+    iret
 %endmacro
 
 ISR_NOERRCODE 0
 ISR_NOERRCODE 1
 ISR_NOERRCODE 2
-ISR_NOERRCODE 3
+
+isr3:
+    push dword 0
+    push dword 3
+    call interrupt_break_wrapper
+    iret
+
 ISR_NOERRCODE 4
 ISR_NOERRCODE 5
 ISR_NOERRCODE 6

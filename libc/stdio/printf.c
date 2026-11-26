@@ -6,9 +6,11 @@
 
 static bool print(const char* data, size_t length) {
 	const unsigned char* bytes = (const unsigned char*) data;
-	for (size_t i = 0; i < length; i++)
-		if (putchar(bytes[i]) == EOF)
+	for (size_t i = 0; i < length; i++) {
+		if (putchar(bytes[i]) == EOF) {
 			return false;
+		}
+	}
 	return true;
 }
 
@@ -81,9 +83,9 @@ int printf(const char* restrict format, ...) {
 				return -1;
 			}
 			const char index[10] = {'0','1','2','3','4','5','6','7','8','9'};
-			unsigned char indexes[9];
+			unsigned char indexes[10];
             unsigned char i = 0;
-			for (unsigned char i = 0; i < 9; i++) {
+			for (unsigned char i = 0; i < 10; i++) {
 				indexes[i] = 0;
 			}
 			while(uint != 0) {

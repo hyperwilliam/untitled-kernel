@@ -1,1 +1,1 @@
-qemu-system-i386 -cdrom UntitledOS.iso --no-reboot --no-shutdown
+qemu-system-i386 -cdrom UntitledOS.iso --no-reboot --no-shutdown -m 16M

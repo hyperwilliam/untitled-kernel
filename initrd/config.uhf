@@ -1,0 +1,35 @@
+Root->
+	// Untitled Hierarchical Format
+	// Format for saving configurations
+	// Example Below shows how a theoretical boot configuration file would be formatted
+        // Strangely, i have not written a parser for this configuration yet.
+	Video->
+		Width/Number=800
+		Height/Number=600
+		Depth/Number=32
+	Video<-
+	Boot->
+		// GraphicsBoot would display a fancy logo on the screen while the OS Starts
+                // However, this has not been implemented yet.
+		GraphicsBoot/Bool=True
+                // DebugLevel, im not sure what this would do except it shows more output the higher the value.
+                // Anyways, some values in this theoretical input would only work in special debug builds due to size considerations.
+		DebugLevel/Uint32=FFFFFFFF
+		// 'SysMode' if enabled, lets users have full control over the system.
+		// If 'SysMode' is disabled, Some operations would be disabled and system Files will be hidden and write/read protected.
+		SysMode/Bool=True;
+	Boot<-
+	Startup->
+		// This Field Will be blank for now;
+		// EXAMPLE;
+		// Apps/Path=[/User/Applications/ExampleApp, /User/Applications/Settings];
+		// Entries are opened one after the other, so 'ExampleApp' would open, then 'Settings';
+	Startup<-
+	Emulate->
+		// This Field Will be blank for now;
+                // Essentially, these options would modify the 'Invalid Instruction' Handler so it emulates the output
+                // Then, returns to program execution, however with the current design this might be tricky.
+		// EXAMPLE:
+		// EmuSSE1/Bool=True;
+	Emulate<-
+Root-<

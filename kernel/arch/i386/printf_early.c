@@ -1,0 +1,140 @@
+#include <limits.h>
+#include <stdbool.h>
+#include <stdarg.h>
+#include <string.h>
+#include <stdio.h>
+#include <kernel/parallel.h>
+// uses parallel port instead of video output
+static bool print_early(const char* data, size_t length) {
+    const unsigned char* bytes = (const unsigned char*) data;
+    for (size_t i = 0; i < length; i++) {
+        if (parallel_putchar(bytes[i]) == EOF) {
+            return false;
+        }
+    }
+    return true;
+}
+
+int printf_early(const char* restrict format, ...) {
+    va_list parameters;
+    va_start(parameters, format);
+
+    int written = 0;
+
+    while (*format != '\0') {
+        size_t maxrem = INT_MAX - written;
+
+        if (format[0] != '%' || format[1] == '%') {
+            if (format[0] == '%')
+                format++;
+            size_t amount = 1;
+            while (format[amount] && format[amount] != '%')
+                amount++;
+            if (maxrem < amount) {
+                // TODO: Set errno to EOVERFLOW.
+                return -1;
+            }
+            if (!print_early(format, amount))
+                return -1;
+            format += amount;
+            written += amount;
+            continue;
+        }
+
+        const char* format_begun_at = format++;
+
+        if (*format == 'c') {
+            format++;
+            char c = (char) va_arg(parameters, int /* char promotes to int */);
+            if (!maxrem) {
+                // TODO: Set errno to EOVERFLOW.
+                return -1;
+            }
+            if (!print_early(&c, sizeof(c)))
+                return -1;
+            written++;
+        } else if (*format == 's') {
+            format++;
+            const char* str = va_arg(parameters, const char*);
+            size_t len = strlen(str);
+            if (maxrem < len) {
+                // TODO: Set errno to EOVERFLOW.
+                return -1;
+            }
+            if (!print_early(str, len))
+                return -1;
+            written += len;
+        } else if (*format == 'x') {
+            format++;
+            unsigned int uint = va_arg(parameters, unsigned int);
+            if (!maxrem) {
+                // TODO: Set errno to EOVERFLOW.
+                return -1;
+            }
+            const char index[16] = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+            for (unsigned char i = 7; i != 255; i--) // probably not the best way i could do this...
+                if (!print_early(&index[(uint >> (i * 4)) & 0xF ], 1))
+                    return -1;
+            written++;
+        } else if (*format == 'u') {
+            format++;
+            unsigned int uint = va_arg(parameters, unsigned int);
+            if (!maxrem) {
+                // TODO: Set errno to EOVERFLOW.
+                return -1;
+            }
+            const char index[10] = {'0','1','2','3','4','5','6','7','8','9'};
+            unsigned char indexes[10];
+            unsigned char i = 0;
+            for (unsigned char i = 0; i < 10; i++) {
+                indexes[i] = 0;
+            }
+            while(uint != 0) {
+                indexes[i] = uint % 10;
+                uint /= 10;
+                i++;
+            }
+
+
+            bool printmore = false;
+            for (unsigned char i = 9; i != 0; i--) {
+                if ((indexes[i] != 0) || printmore) {
+                    printmore = true;
+                    if (!print_early(&index[indexes[i]], 1))
+                        return -1;
+                }
+            }
+            if (!print_early(&index[indexes[0]], 1)) {
+                return -1;
+            }
+            written++;
+        } else if (*format == 'X') {
+            format++;
+            unsigned int uint = va_arg(parameters, unsigned int);
+            if (!maxrem) {
+                // TODO: Set errno to EOVERFLOW.
+                return -1;
+            }
+            const char index[16] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+            for (unsigned char i = 7; i != 255; i--) {
+                if (!print_early(&index[(uint >> (i * 4)) & 0xF], 1))
+                    return -1;
+            }
+            written++;
+        } else {
+            format = format_begun_at;
+            size_t len = strlen(format);
+            if (maxrem < len) {
+                // TODO: Set errno to EOVERFLOW.
+                return -1;
+            }
+            if (!print_early(format, len))
+                return -1;
+            written += len;
+            format += len;
+        }
+    }
+
+    va_end(parameters);
+    return written;
+}
